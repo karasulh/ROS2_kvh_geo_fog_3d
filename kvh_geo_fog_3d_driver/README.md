@@ -151,7 +151,7 @@ You should see the messages listed in the KVH-specific messages section above.
 Now you should be able to launch the driver by running
 
 ```bash
-$ ros2 launch kvh_geo_fog_3d_driver kvh_geo_fog_3d_node_launch port:=<port> baud:=<baud> # E.g., port="/dev/ttyUSB0" baud="921600"
+$ ros2 launch kvh_geo_fog_3d_driver kvh_geo_fog_3d_node_launch.xml port:=<port> baud:=<baud> # E.g., port="/dev/ttyUSB0" baud="921600"
 ```
 If everything is set up properly, you should be able to see data being output on each of the topics listed above. Currently the driver is hardcoded to output the data from the following kvh packets:
 1. System State
@@ -177,7 +177,7 @@ Note that the above assumes you know the baudrate, which is 115200 by default. I
 2. Contact KVH and get access to the GEO-FOG manager, which is a GUI tool for interacting with the KVH.
 3. We have provided a ros node that attempts to automatically detect the baud rate by trying each of the buad rates and checking for returned data. You can launch this node by running the command below. By default it will start at 1200, but the starting baud rate setting is available if you believe that the baud rate it is finding is incorrect or recieving random data (i.e. allows you to skip baud rates).
 ```bash
-$ roslaunch kvh_geo_fog_3d_driver determine_baud.launch starting_baud:=<baud_rate>
+$ ros2 launch kvh_geo_fog_3d_driver determine_baud_launch.xml starting_baud:=<baud_rate>
 ```
 Due to the rs232 connecting library we use, the possible baud rates are:
 1200, 1800, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 500000, 576000, 921600, 1000000
