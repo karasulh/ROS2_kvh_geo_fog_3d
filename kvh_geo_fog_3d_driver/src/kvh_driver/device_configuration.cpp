@@ -21,7 +21,7 @@
  * it is requested that you send an email to opensource@mitre.org in order to
  * let us know where this software is being used.
  *********************************************************************/
-
+#include <iostream>
 #include "kvh_geo_fog_3d_device_configuration.hpp"
 
 // RS 232
@@ -67,7 +67,7 @@ namespace kvh
     int unsupported = 0;
     int currentPacketPeriod = 0;
 
-    for (int i = 0; i < _packetsRequested.size(); i++)
+    for (int i = 0; (std::size_t)i < _packetsRequested.size(); i++)
     {
       std::pair<packet_id_e, int> packet = _packetsRequested[i];
 
@@ -301,7 +301,7 @@ namespace kvh
     std::set<packet_id_e> packetIdList;
     int dataThroughput = 0;
 
-    for (int i = 0; i < _packetsRequested.size(); i++)
+    for (int i = 0; (std::size_t)i < _packetsRequested.size(); i++)
     {
       std::pair<packet_id_e, uint16_t> packet = _packetsRequested[i];
 

@@ -32,11 +32,11 @@
 
 #pragma once
 
-#include <ros/ros.h>
-#include <rviz/panel.h>
+#include <rclcpp/rclcpp.hpp>
+#include <rviz_common/panel.hpp>
 #include <QHBoxLayout>
 #include <unordered_map>
-#include "diagnostic_msgs/DiagnosticArray.h"
+#include "diagnostic_msgs/msg/diagnostic_array.hpp"
 
 #include "kvh_status_painter.hpp"
 
@@ -47,18 +47,18 @@ namespace kvh
    * @ingroup kvh
    * @brief RVIZ panel for displaying KVH sensor status.
    */
-  class StatusPanel : public rviz::Panel
+  class StatusPanel : public rviz_common::Panel
   {
     Q_OBJECT
 
   public:
     StatusPanel(QWidget* parent = 0);
     QHBoxLayout* StatusIndicatorFactory(bool, std::string, std::string);
-    void DiagnosticsCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr&);
+    void DiagnosticsCallback(const diagnostic_msgs::msg::DiagnosticArray&);
   protected:
-    ros::NodeHandle nh_; ///< Our ROS nodehandle object
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("kvh_geo_fog_3d_rviz");
     std::unordered_map<std::string, StatusPainter*> painter_map_; ///< Holds our key/value set of diagnostics message strings to painter objects
-    ros::Subscriber diag_sub_; ///< ROS subscriber for diagnostics information
+    rclcpp::Subscription<diagnostic_msgs::msg::DiagnosticArray>::SharedPtr diag_sub_;     
 
   };
 

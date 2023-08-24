@@ -45,11 +45,11 @@ tf2::Quaternion quatFromRPY(double roll, double pitch, double yaw)
 ///////////////////////////////////////
 // Custom ROS Message Publishers
 ///////////////////////////////////////
-void PublishSystemState(ros::Publisher &_publisher, system_state_packet_t _packet)
+void PublishSystemState(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DSystemState sysStateMsg;
-    sysStateMsg.header.stamp = ros::Time::now();
-
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DSystemState sysStateMsg;
+    sysStateMsg.header.stamp = clock.now();
+    
     sysStateMsg.system_status = _packet.system_status.r;
     sysStateMsg.filter_status = _packet.filter_status.r;
 
@@ -82,13 +82,16 @@ void PublishSystemState(ros::Publisher &_publisher, system_state_packet_t _packe
     sysStateMsg.longitude_stddev_m = _packet.standard_deviation[1];
     sysStateMsg.height_stddev_m = _packet.standard_deviation[2];
 
-    _publisher.publish(sysStateMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DSystemState>>(_publisher);
+    if(publisher)
+        publisher->publish(sysStateMsg);
+    
 }
 
-void PublishSatellites(ros::Publisher &_publisher, satellites_packet_t _packet)
+void PublishSatellites(rclcpp::PublisherBase::SharedPtr& _publisher, satellites_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DSatellites satellitesMsg;
-    satellitesMsg.header.stamp = ros::Time::now();
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DSatellites satellitesMsg;
+    satellitesMsg.header.stamp = clock.now();
     satellitesMsg.hdop = _packet.hdop;
     satellitesMsg.vdop = _packet.vdop;
     satellitesMsg.gps_satellites = _packet.gps_satellites;
@@ -96,14 +99,16 @@ void PublishSatellites(ros::Publisher &_publisher, satellites_packet_t _packet)
     satellitesMsg.beidou_satellites = _packet.beidou_satellites;
     satellitesMsg.galileo_satellites = _packet.sbas_satellites;
 
-    _publisher.publish(satellitesMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DSatellites>>(_publisher);
+    if(publisher)
+        publisher->publish(satellitesMsg);
 }
 
-void PublishSatellitesDetailed(ros::Publisher &_publisher, detailed_satellites_packet_t _packet)
+void PublishSatellitesDetailed(rclcpp::PublisherBase::SharedPtr& _publisher, detailed_satellites_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DDetailSatellites detailSatellitesMsg;
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DDetailSatellites detailSatellitesMsg;
 
-    detailSatellitesMsg.header.stamp = ros::Time::now();
+    detailSatellitesMsg.header.stamp = clock.now();
 
     // MAXIMUM_DETAILED_SATELLITES is defined as 32 in spatial_packets.h
     // We must check if each field equals 0 as that denotes the end of the array
@@ -127,47 +132,55 @@ void PublishSatellitesDetailed(ros::Publisher &_publisher, detailed_satellites_p
         detailSatellitesMsg.snr_decibal.push_back(satellite.snr);
     }
 
-    _publisher.publish(detailSatellitesMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DDetailSatellites>>(_publisher);
+    if(publisher)
+        publisher->publish(detailSatellitesMsg);
 }
 
-void PublishLocalMagnetics(ros::Publisher &_publisher, local_magnetics_packet_t _packet)
+void PublishLocalMagnetics(rclcpp::PublisherBase::SharedPtr &_publisher, local_magnetics_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DLocalMagneticField localMagFieldMsg;
-    localMagFieldMsg.header.stamp = ros::Time::now();
-    localMagFieldMsg.loc_mag_field_x_mG = _packet.magnetic_field[0];
-    localMagFieldMsg.loc_mag_field_y_mG = _packet.magnetic_field[1];
-    localMagFieldMsg.loc_mag_field_z_mG = _packet.magnetic_field[2];
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DLocalMagneticField localMagFieldMsg;
+    localMagFieldMsg.header.stamp = clock.now();
+    localMagFieldMsg.loc_mag_field_x_mg = _packet.magnetic_field[0];
+    localMagFieldMsg.loc_mag_field_y_mg = _packet.magnetic_field[1];
+    localMagFieldMsg.loc_mag_field_z_mg = _packet.magnetic_field[2];
 
-    _publisher.publish(localMagFieldMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DLocalMagneticField>>(_publisher);
+    if(publisher)
+        publisher->publish(localMagFieldMsg);
 }
 
-void PublishUtmPosition(ros::Publisher &_publisher, utm_position_packet_t _packet)
+void PublishUtmPosition(rclcpp::PublisherBase::SharedPtr &_publisher, utm_position_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DUTMPosition utmPosMsg;
-    utmPosMsg.header.stamp = ros::Time::now();
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DUTMPosition utmPosMsg;
+    utmPosMsg.header.stamp = clock.now();
     utmPosMsg.northing_m = _packet.position[0];
     utmPosMsg.easting_m = _packet.position[1];
     utmPosMsg.height_m = _packet.position[2];
     utmPosMsg.zone_character = _packet.zone;
 
-    _publisher.publish(utmPosMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DUTMPosition>>(_publisher);
+    if(publisher)
+        publisher->publish(utmPosMsg);
 }
 
-void PublishEcefPosition(ros::Publisher &_publisher, ecef_position_packet_t _packet)
+void PublishEcefPosition(rclcpp::PublisherBase::SharedPtr&_publisher, ecef_position_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DECEFPos ecefPosMsg;
-    ecefPosMsg.header.stamp = ros::Time::now();
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DECEFPos ecefPosMsg;
+    ecefPosMsg.header.stamp = clock.now();
     ecefPosMsg.ecef_x_m = _packet.position[0];
     ecefPosMsg.ecef_y_m = _packet.position[1];
     ecefPosMsg.ecef_z_m = _packet.position[2];
 
-    _publisher.publish(ecefPosMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DECEFPos>>(_publisher);
+    if(publisher)
+        publisher->publish(ecefPosMsg);
 }
 
-void PublishNorthSeekingStatus(ros::Publisher &_publisher, north_seeking_status_packet_t _packet)
+void PublishNorthSeekingStatus(rclcpp::PublisherBase::SharedPtr &_publisher, north_seeking_status_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DNorthSeekingInitStatus northSeekInitStatMsg;
-    northSeekInitStatMsg.header.stamp = ros::Time::now();
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DNorthSeekingInitStatus northSeekInitStatMsg;
+    northSeekInitStatMsg.header.stamp = clock.now();
 
     northSeekInitStatMsg.flags = _packet.north_seeking_status.r;
     northSeekInitStatMsg.quadrant_1_data_per = _packet.quadrant_data_collection_progress[0];
@@ -182,27 +195,31 @@ void PublishNorthSeekingStatus(ros::Publisher &_publisher, north_seeking_status_
     northSeekInitStatMsg.current_gyro_bias_sol_z_rad_s = _packet.current_gyroscope_bias_solution[2];
     northSeekInitStatMsg.current_gyro_bias_sol_error_per = _packet.current_gyroscope_bias_solution_error;
 
-    _publisher.publish(northSeekInitStatMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DNorthSeekingInitStatus>>(_publisher);
+    if(publisher)
+        publisher->publish(northSeekInitStatMsg);
 }
 
-void PublishKvhOdometerState(ros::Publisher &_publisher, odometer_state_packet_t _packet)
+void PublishKvhOdometerState(rclcpp::PublisherBase::SharedPtr &_publisher, odometer_state_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DOdometerState odometerStateMsg;
-    odometerStateMsg.header.stamp = ros::Time::now();
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DOdometerState odometerStateMsg;
+    odometerStateMsg.header.stamp = clock.now();
     odometerStateMsg.odometer_pulse_count = _packet.pulse_count;
     odometerStateMsg.odometer_distance_m = _packet.distance;
     odometerStateMsg.odometer_speed_mps = _packet.speed;
     odometerStateMsg.odometer_slip_m = _packet.slip;
     odometerStateMsg.odometer_active = _packet.active;
 
-    _publisher.publish(odometerStateMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DOdometerState>>(_publisher);
+    if(publisher)
+        publisher->publish(odometerStateMsg);
 }
 
-void PublishRawSensors(ros::Publisher &_publisher, raw_sensors_packet_t _packet)
+void PublishRawSensors(rclcpp::PublisherBase::SharedPtr &_publisher, raw_sensors_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DRawSensors rawSensorMsg;
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DRawSensors rawSensorMsg;
 
-    rawSensorMsg.header.stamp = ros::Time::now();
+    rawSensorMsg.header.stamp = clock.now();
 
     rawSensorMsg.accelerometer_x_mpss = _packet.accelerometers[0];
     rawSensorMsg.accelerometer_y_mpss = _packet.accelerometers[1];
@@ -212,22 +229,24 @@ void PublishRawSensors(ros::Publisher &_publisher, raw_sensors_packet_t _packet)
     rawSensorMsg.gyro_y_rps = _packet.gyroscopes[1];
     rawSensorMsg.gyro_z_rps = _packet.gyroscopes[2];
 
-    rawSensorMsg.magnetometer_x_mG = _packet.magnetometers[0];
-    rawSensorMsg.magnetometer_y_mG = _packet.magnetometers[1];
-    rawSensorMsg.magnetometer_z_mG = _packet.magnetometers[2];
+    rawSensorMsg.magnetometer_x_mg = _packet.magnetometers[0];
+    rawSensorMsg.magnetometer_y_mg = _packet.magnetometers[1];
+    rawSensorMsg.magnetometer_z_mg = _packet.magnetometers[2];
 
     rawSensorMsg.imu_temp_c = _packet.imu_temperature;
     rawSensorMsg.pressure_pa = _packet.pressure;
     rawSensorMsg.pressure_temp_c = _packet.pressure_temperature;
 
-    _publisher.publish(rawSensorMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DRawSensors>>(_publisher);
+    if(publisher)
+        publisher->publish(rawSensorMsg);
 }
 
-void PublishRawGnss(ros::Publisher &_publisher, raw_gnss_packet_t _packet)
+void PublishRawGnss(rclcpp::PublisherBase::SharedPtr &_publisher, raw_gnss_packet_t _packet,rclcpp::Clock& clock)
 {
-    kvh_geo_fog_3d_msgs::KvhGeoFog3DRawGNSS rawGnssMsg;
+    kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DRawGNSS rawGnssMsg;
 
-    rawGnssMsg.header.stamp = ros::Time::now();
+    rawGnssMsg.header.stamp = clock.now();
     rawGnssMsg.unix_time_s = _packet.unix_time_seconds;
     rawGnssMsg.unix_time_us = _packet.microseconds;
 
@@ -256,13 +275,15 @@ void PublishRawGnss(ros::Publisher &_publisher, raw_gnss_packet_t _packet)
     rawGnssMsg.tilt_valid = _packet.flags.b.tilt_valid;
     rawGnssMsg.heading_valid = _packet.flags.b.heading_valid;
 
-    _publisher.publish(rawGnssMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<kvh_geo_fog_3d_msgs::msg::KvhGeoFog3DRawGNSS>>(_publisher);
+    if(publisher)
+        publisher->publish(rawGnssMsg);
 }
 
-void PublishIMURaw(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishIMURaw(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuRaw;
-    imuRaw.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuRaw;
+    imuRaw.header.stamp = clock.now();
     imuRaw.header.frame_id = "imu_link_frd";
 
     // \todo Fill in orientation from sysState RPY? Or from quaternion packet
@@ -286,13 +307,15 @@ void PublishIMURaw(ros::Publisher &_publisher, system_state_packet_t _sysStatePa
     // imuDataRaw.linear_acceleration_covariance[4]
     // imuDataRaw.linear_acceleration_covariance[8]
 
-    _publisher.publish(imuRaw);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRaw);
 }
 
-void PublishIMURawFLU(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishIMURawFLU(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuRawFLU;
-    imuRawFLU.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuRawFLU;
+    imuRawFLU.header.stamp = clock.now();
     imuRawFLU.header.frame_id = "imu_link_flu";
 
     // \todo Fill in orientation from sysState RPY? Or from quaternion packet
@@ -318,13 +341,15 @@ void PublishIMURawFLU(ros::Publisher &_publisher, system_state_packet_t _sysStat
     // imuRawFLU.linear_acceleration_covariance[4]
     // imuRawFLU.linear_acceleration_covariance[8]
 
-    _publisher.publish(imuRawFLU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRawFLU);
 }
 
-void PublishIMU_NED(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, euler_orientation_standard_deviation_packet_t _eulStdDevPack)
+void PublishIMU_NED(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, euler_orientation_standard_deviation_packet_t _eulStdDevPack,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuNED;
-    imuNED.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuNED;
+    imuNED.header.stamp = clock.now();
     imuNED.header.frame_id = "imu_link_frd";
 
     // Orientation
@@ -360,13 +385,15 @@ void PublishIMU_NED(ros::Publisher &_publisher, system_state_packet_t _sysStateP
     // imuRawFLU.linear_acceleration_covariance[4]
     // imuRawFLU.linear_acceleration_covariance[8]
 
-    _publisher.publish(imuNED);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuNED);
 }
 
-void PublishIMU_ENU(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, euler_orientation_standard_deviation_packet_t _eulStdDevPack)
+void PublishIMU_ENU(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, euler_orientation_standard_deviation_packet_t _eulStdDevPack,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuENU;
-    imuENU.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuENU;
+    imuENU.header.stamp = clock.now();
     imuENU.header.frame_id = "imu_link_flu";
 
     //For NED -> ENU transformation:
@@ -401,13 +428,15 @@ void PublishIMU_ENU(ros::Publisher &_publisher, system_state_packet_t _sysStateP
     imuENU.linear_acceleration.y = -1 * _sysStatePacket.body_acceleration[1];
     imuENU.linear_acceleration.z = -1 * _sysStatePacket.body_acceleration[2];
 
-    _publisher.publish(imuENU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuENU);
 }
 
-void PublishIMU_RPY_NED(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishIMU_RPY_NED(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    geometry_msgs::Vector3Stamped imuRpyNED;
-    imuRpyNED.header.stamp = ros::Time::now();
+    geometry_msgs::msg::Vector3Stamped imuRpyNED;
+    imuRpyNED.header.stamp = clock.now();
     imuRpyNED.header.frame_id = "imu_link_frd";
 
     double roll = _sysStatePacket.orientation[0];
@@ -419,12 +448,15 @@ void PublishIMU_RPY_NED(ros::Publisher &_publisher, system_state_packet_t _sysSt
     imuRpyNED.vector.y = pitch;
     imuRpyNED.vector.z = boundedYaw;
 
-    _publisher.publish(imuRpyNED);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRpyNED);
 }
-void PublishIMU_RPY_NED_DEG(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+
+void PublishIMU_RPY_NED_DEG(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    geometry_msgs::Vector3Stamped imuRpyNEDDeg;
-    imuRpyNEDDeg.header.stamp = ros::Time::now();
+    geometry_msgs::msg::Vector3Stamped imuRpyNEDDeg;
+    imuRpyNEDDeg.header.stamp = clock.now();
     imuRpyNEDDeg.header.frame_id = "imu_link_frd";
 
     double roll = _sysStatePacket.orientation[0];
@@ -436,13 +468,15 @@ void PublishIMU_RPY_NED_DEG(ros::Publisher &_publisher, system_state_packet_t _s
     imuRpyNEDDeg.vector.y = ((pitch * 180.0) / M_PI);
     imuRpyNEDDeg.vector.z = ((boundedYaw * 180.0) / M_PI);
 
-    _publisher.publish(imuRpyNEDDeg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRpyNEDDeg);
 }
 
-void PublishIMU_RPY_ENU(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishIMU_RPY_ENU(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    geometry_msgs::Vector3Stamped imuRpyENU;
-    imuRpyENU.header.stamp = ros::Time::now();
+    geometry_msgs::msg::Vector3Stamped imuRpyENU;
+    imuRpyENU.header.stamp = clock.now();
     imuRpyENU.header.frame_id = "imu_link_flu";
 
     //For NED -> ENU transformation:
@@ -456,13 +490,15 @@ void PublishIMU_RPY_ENU(ros::Publisher &_publisher, system_state_packet_t _sysSt
     imuRpyENU.vector.y = pitch;
     imuRpyENU.vector.z = yawENU;
 
-    _publisher.publish(imuRpyENU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRpyENU);
 }
 
-void PublishIMU_RPY_ENU_DEG(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishIMU_RPY_ENU_DEG(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    geometry_msgs::Vector3Stamped imuRpyENUDeg;
-    imuRpyENUDeg.header.stamp = ros::Time::now();
+    geometry_msgs::msg::Vector3Stamped imuRpyENUDeg;
+    imuRpyENUDeg.header.stamp = clock.now();
     imuRpyENUDeg.header.frame_id = "imu_link_flu";
 
     //For NED -> ENU transformation:
@@ -477,13 +513,15 @@ void PublishIMU_RPY_ENU_DEG(ros::Publisher &_publisher, system_state_packet_t _s
     imuRpyENUDeg.vector.y = pitchDeg;
     imuRpyENUDeg.vector.z = yawENUDeg;
 
-    _publisher.publish(imuRpyENUDeg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::Vector3Stamped>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRpyENUDeg);
 }
 
-void PublishNavSatFix(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket)
+void PublishNavSatFix(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,rclcpp::Clock& clock)
 {
-    sensor_msgs::NavSatFix navSatFixMsg;
-    navSatFixMsg.header.stamp = ros::Time::now();
+    sensor_msgs::msg::NavSatFix navSatFixMsg;
+    navSatFixMsg.header.stamp = clock.now();
     navSatFixMsg.header.frame_id = "gps";
 
     // Set nav sat status
@@ -516,13 +554,15 @@ void PublishNavSatFix(ros::Publisher &_publisher, system_state_packet_t _sysStat
     navSatFixMsg.position_covariance[4] = pow(_sysStatePacket.standard_deviation[0], 2);
     navSatFixMsg.position_covariance[8] = pow(_sysStatePacket.standard_deviation[2], 2);
 
-    _publisher.publish(navSatFixMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>>(_publisher);
+    if(publisher)
+        publisher->publish(navSatFixMsg);
 }
 
-void PublishRawNavSatFix(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, raw_gnss_packet_t _rawGnssPacket)
+void PublishRawNavSatFix(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, raw_gnss_packet_t _rawGnssPacket,rclcpp::Clock& clock)
 {
-    sensor_msgs::NavSatFix rawNavSatFixMsg;
-    rawNavSatFixMsg.header.stamp = ros::Time::now();
+    sensor_msgs::msg::NavSatFix rawNavSatFixMsg;
+    rawNavSatFixMsg.header.stamp = clock.now();
     rawNavSatFixMsg.header.frame_id = "gps";
 
     //NavSatFix specifies degrees as lat/lon, but KVH publishes in radians
@@ -556,27 +596,31 @@ void PublishRawNavSatFix(ros::Publisher &_publisher, system_state_packet_t _sysS
     rawNavSatFixMsg.position_covariance[4] = pow(_rawGnssPacket.position_standard_deviation[0], 2);
     rawNavSatFixMsg.position_covariance[8] = pow(_rawGnssPacket.position_standard_deviation[2], 2);
 
-    _publisher.publish(rawNavSatFixMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::NavSatFix>>(_publisher);
+    if(publisher)
+        publisher->publish(rawNavSatFixMsg);
 }
 
-void PublishMagField(ros::Publisher &_publisher, raw_sensors_packet_t _rawSensorPack)
+void PublishMagField(rclcpp::PublisherBase::SharedPtr &_publisher, raw_sensors_packet_t _rawSensorPack,rclcpp::Clock& clock)
 {
-    sensor_msgs::MagneticField magFieldMsg;
+    sensor_msgs::msg::MagneticField magFieldMsg;
 
-    magFieldMsg.header.stamp = ros::Time::now();
+    magFieldMsg.header.stamp = clock.now();
     magFieldMsg.header.frame_id = "imu_link_frd";
     magFieldMsg.magnetic_field.x = _rawSensorPack.magnetometers[0];
     magFieldMsg.magnetic_field.y = _rawSensorPack.magnetometers[1];
     magFieldMsg.magnetic_field.z = _rawSensorPack.magnetometers[2];
 
-    _publisher.publish(magFieldMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::MagneticField>>(_publisher);
+    if(publisher)
+        publisher->publish(magFieldMsg);
 }
 
-void PublishOdomNED(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, utm_position_packet_t _utmPosPacket,
-                    euler_orientation_standard_deviation_packet_t _eulerStdPacket, body_velocity_packet_t _bodyVelPacket)
+void PublishOdomNED(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, utm_position_packet_t _utmPosPacket,
+                    euler_orientation_standard_deviation_packet_t _eulerStdPacket, body_velocity_packet_t _bodyVelPacket,rclcpp::Clock& clock)
 {
-    nav_msgs::Odometry odomMsgNED;
-    odomMsgNED.header.stamp = ros::Time::now();
+    nav_msgs::msg::Odometry odomMsgNED;
+    odomMsgNED.header.stamp = clock.now();
     odomMsgNED.header.frame_id = "utm_ned";     //The nav_msgs/Odometry "Pose" section should be in this frame
     odomMsgNED.child_frame_id = "imu_link_frd"; //The nav_msgs/Odometry "Twist" section should be in this frame
 
@@ -617,14 +661,16 @@ void PublishOdomNED(ros::Publisher &_publisher, system_state_packet_t _sysStateP
     odomMsgNED.twist.covariance[28] = 0.0001;
     odomMsgNED.twist.covariance[35] = 0.0001;
 
-    _publisher.publish(odomMsgNED);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<nav_msgs::msg::Odometry>>(_publisher);
+    if(publisher)
+        publisher->publish(odomMsgNED);
 }
 
-void PublishOdomENU(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, utm_position_packet_t _utmPosPacket,
-                    euler_orientation_standard_deviation_packet_t _eulStdPacket, body_velocity_packet_t _bodyVelPacket)
+void PublishOdomENU(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, utm_position_packet_t _utmPosPacket,
+                    euler_orientation_standard_deviation_packet_t _eulStdPacket, body_velocity_packet_t _bodyVelPacket,rclcpp::Clock& clock)
 {
-    nav_msgs::Odometry odomMsgENU;
-    odomMsgENU.header.stamp = ros::Time::now();
+    nav_msgs::msg::Odometry odomMsgENU;
+    odomMsgENU.header.stamp = clock.now();
     odomMsgENU.header.frame_id = "utm_enu";     //The nav_msgs/Odometry "Pose" section should be in this frame
     odomMsgENU.child_frame_id = "imu_link_flu"; //The nav_msgs/Odometry "Twist" section should be in this frame
 
@@ -673,14 +719,16 @@ void PublishOdomENU(ros::Publisher &_publisher, system_state_packet_t _sysStateP
     odomMsgENU.twist.covariance[28] = 0.0001;
     odomMsgENU.twist.covariance[35] = 0.0001;
 
-    _publisher.publish(odomMsgENU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<nav_msgs::msg::Odometry>>(_publisher);
+    if(publisher)
+        publisher->publish(odomMsgENU);
 }
 
-void PublishOdomState(ros::Publisher &_publisher, odometer_state_packet_t _odomStatePacket, double odomPulseToMeters)
+void PublishOdomState(rclcpp::PublisherBase::SharedPtr &_publisher, odometer_state_packet_t _odomStatePacket, double odomPulseToMeters,rclcpp::Clock& clock)
 {
-    nav_msgs::Odometry kvhOdomStateMsg;
+    nav_msgs::msg::Odometry kvhOdomStateMsg;
 
-    kvhOdomStateMsg.header.stamp = ros::Time::now();
+    kvhOdomStateMsg.header.stamp = clock.now();
 
     //Technically this should be w.r.t the fixed frame locked to your wheel
     //with the encoder mounted. But, since I don't know what you're going to
@@ -696,11 +744,13 @@ void PublishOdomState(ros::Publisher &_publisher, odometer_state_packet_t _odomS
     kvhOdomStateMsg.twist.twist.linear.y = 0;
     kvhOdomStateMsg.twist.twist.linear.z = 0;
 
-    _publisher.publish(kvhOdomStateMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<nav_msgs::msg::Odometry>>(_publisher);
+    if(publisher)
+        publisher->publish(kvhOdomStateMsg);
 }
 
-void PublishOdomSpeed(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket, odometer_state_packet_t _odomStatePacket,
-                      double _trackWidth, double _odometerVelocityCovariance, bool _encoderOnLeft)
+void PublishOdomSpeed(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket, odometer_state_packet_t _odomStatePacket,
+                      double _trackWidth, double _odometerVelocityCovariance, bool _encoderOnLeft,rclcpp::Clock& clock)
 {
     double yawRate = _sysStatePacket.angular_velocity[2];
     //Derived from r = v/w, with r = radius of curvature, v = velocity,  and w = angular rate,
@@ -716,9 +766,9 @@ void PublishOdomSpeed(ros::Publisher &_publisher, system_state_packet_t _sysStat
         vehicleVelocity = _odomStatePacket.speed - (0.5 * trackWidth * yawRate);
     } //end: else
 
-    geometry_msgs::TwistWithCovarianceStamped kvhOdomVehSpeedMsg;
+    geometry_msgs::msg::TwistWithCovarianceStamped kvhOdomVehSpeedMsg;
 
-    kvhOdomVehSpeedMsg.header.stamp = ros::Time::now();
+    kvhOdomVehSpeedMsg.header.stamp = clock.now();
     kvhOdomVehSpeedMsg.header.frame_id = "base_link";
 
     kvhOdomVehSpeedMsg.twist.twist.linear.x = vehicleVelocity;
@@ -728,13 +778,15 @@ void PublishOdomSpeed(ros::Publisher &_publisher, system_state_packet_t _sysStat
     kvhOdomVehSpeedMsg.twist.covariance[7] = _odometerVelocityCovariance;
     kvhOdomVehSpeedMsg.twist.covariance[14] = _odometerVelocityCovariance;
 
-    _publisher.publish(kvhOdomVehSpeedMsg);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>>(_publisher);
+    if(publisher)
+        publisher->publish(kvhOdomVehSpeedMsg);
 }
 
-void PublishIMUSensorRaw(ros::Publisher &_publisher, raw_sensors_packet_t _rawSensorPack)
+void PublishIMUSensorRaw(rclcpp::PublisherBase::SharedPtr &_publisher, raw_sensors_packet_t _rawSensorPack,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuRaw;
-    imuRaw.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuRaw;
+    imuRaw.header.stamp = clock.now();
     imuRaw.header.frame_id = "imu_link_frd";
 
     // No orientation, so set cov to -1
@@ -750,13 +802,15 @@ void PublishIMUSensorRaw(ros::Publisher &_publisher, raw_sensors_packet_t _rawSe
     imuRaw.linear_acceleration.y = _rawSensorPack.accelerometers[1];
     imuRaw.linear_acceleration.z = _rawSensorPack.accelerometers[2];
 
-    _publisher.publish(imuRaw);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRaw);
 }
 
-void PublishIMUSensorRawFLU(ros::Publisher &_publisher, raw_sensors_packet_t _rawSensorPack)
+void PublishIMUSensorRawFLU(rclcpp::PublisherBase::SharedPtr &_publisher, raw_sensors_packet_t _rawSensorPack,rclcpp::Clock& clock)
 {
-    sensor_msgs::Imu imuRawFLU;
-    imuRawFLU.header.stamp = ros::Time::now();
+    sensor_msgs::msg::Imu imuRawFLU;
+    imuRawFLU.header.stamp = clock.now();
     imuRawFLU.header.frame_id = "imu_link_flu";
 
     // ANGULAR VELOCITY
@@ -769,14 +823,16 @@ void PublishIMUSensorRawFLU(ros::Publisher &_publisher, raw_sensors_packet_t _ra
     imuRawFLU.linear_acceleration.y = -1 * _rawSensorPack.accelerometers[1];
     imuRawFLU.linear_acceleration.z = -1 * _rawSensorPack.accelerometers[2];
 
-    _publisher.publish(imuRawFLU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<sensor_msgs::msg::Imu>>(_publisher);
+    if(publisher)
+        publisher->publish(imuRawFLU);
 }
 
-void PublishVelNEDTwist(ros::Publisher &_publisher, system_state_packet_t _sysStatePack, velocity_standard_deviation_packet_t _velStdPack)
+void PublishVelNEDTwist(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePack, velocity_standard_deviation_packet_t _velStdPack,rclcpp::Clock& clock)
 {
-    geometry_msgs::TwistWithCovarianceStamped velNED;
+    geometry_msgs::msg::TwistWithCovarianceStamped velNED;
     velNED.header.frame_id = "utm_ned";
-    velNED.header.stamp = ros::Time::now();
+    velNED.header.stamp = clock.now();
     velNED.twist.twist.linear.x = _sysStatePack.velocity[0];
     velNED.twist.twist.linear.y = _sysStatePack.velocity[1];
     velNED.twist.twist.linear.z = _sysStatePack.velocity[2];
@@ -785,14 +841,16 @@ void PublishVelNEDTwist(ros::Publisher &_publisher, system_state_packet_t _sysSt
     velNED.twist.covariance[7] = pow(_velStdPack.standard_deviation[1], 2);
     velNED.twist.covariance[14] = pow(_velStdPack.standard_deviation[2], 2);
 
-    _publisher.publish(velNED);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>>(_publisher);
+    if(publisher)
+        publisher->publish(velNED);
 }
 
-void PublishVelENUTwist(ros::Publisher &_publisher, system_state_packet_t _sysStatePack, velocity_standard_deviation_packet_t _velStdPack)
+void PublishVelENUTwist(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePack, velocity_standard_deviation_packet_t _velStdPack,rclcpp::Clock& clock)
 {
-    geometry_msgs::TwistWithCovarianceStamped velENU;
+    geometry_msgs::msg::TwistWithCovarianceStamped velENU;
     velENU.header.frame_id = "utm_enu";
-    velENU.header.stamp = ros::Time::now();
+    velENU.header.stamp = clock.now();
     velENU.twist.twist.linear.x = _sysStatePack.velocity[1];
     velENU.twist.twist.linear.y = _sysStatePack.velocity[0];
     velENU.twist.twist.linear.z = -1 * (_sysStatePack.velocity[2]);
@@ -801,15 +859,17 @@ void PublishVelENUTwist(ros::Publisher &_publisher, system_state_packet_t _sysSt
     velENU.twist.covariance[7] = pow(_velStdPack.standard_deviation[0], 2);
     velENU.twist.covariance[14] = pow(_velStdPack.standard_deviation[2], 2);
 
-    _publisher.publish(velENU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>>(_publisher);
+    if(publisher)
+        publisher->publish(velENU);
 }
 
-void PublishVelBodyTwistFLU(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket,
-                            body_velocity_packet_t _bodyVelPack, velocity_standard_deviation_packet_t _velStdPack)
+void PublishVelBodyTwistFLU(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,
+                            body_velocity_packet_t _bodyVelPack, velocity_standard_deviation_packet_t _velStdPack,rclcpp::Clock& clock)
 {
-    geometry_msgs::TwistWithCovarianceStamped bodyVelFLU;
+    geometry_msgs::msg::TwistWithCovarianceStamped bodyVelFLU;
     bodyVelFLU.header.frame_id = "imu_link_flu";
-    bodyVelFLU.header.stamp = ros::Time::now();
+    bodyVelFLU.header.stamp = clock.now();
     bodyVelFLU.twist.twist.linear.x = _bodyVelPack.velocity[0];
     bodyVelFLU.twist.twist.linear.y = -(_bodyVelPack.velocity[1]);
     bodyVelFLU.twist.twist.linear.z = -(_bodyVelPack.velocity[2]);
@@ -821,15 +881,17 @@ void PublishVelBodyTwistFLU(ros::Publisher &_publisher, system_state_packet_t _s
     bodyVelFLU.twist.covariance[7] = pow(bodyVelStdDevY, 2);
     bodyVelFLU.twist.covariance[14] = pow(_velStdPack.standard_deviation[2], 2);
 
-    _publisher.publish(bodyVelFLU);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>>(_publisher);
+    if(publisher)
+        publisher->publish(bodyVelFLU);
 }
 
-void PublishVelBodyTwistFRD(ros::Publisher &_publisher, system_state_packet_t _sysStatePacket,
-                            body_velocity_packet_t _bodyVelPack, velocity_standard_deviation_packet_t _velStdPack)
+void PublishVelBodyTwistFRD(rclcpp::PublisherBase::SharedPtr &_publisher, system_state_packet_t _sysStatePacket,
+                            body_velocity_packet_t _bodyVelPack, velocity_standard_deviation_packet_t _velStdPack,rclcpp::Clock& clock)
 {
-    geometry_msgs::TwistWithCovarianceStamped bodyVelFRD;
+    geometry_msgs::msg::TwistWithCovarianceStamped bodyVelFRD;
     bodyVelFRD.header.frame_id = "imu_link_frd";
-    bodyVelFRD.header.stamp = ros::Time::now();
+    bodyVelFRD.header.stamp = clock.now();
     bodyVelFRD.twist.twist.linear.x = _bodyVelPack.velocity[0];
     bodyVelFRD.twist.twist.linear.y = _bodyVelPack.velocity[1];
     bodyVelFRD.twist.twist.linear.z = _bodyVelPack.velocity[2];
@@ -841,5 +903,7 @@ void PublishVelBodyTwistFRD(ros::Publisher &_publisher, system_state_packet_t _s
     bodyVelFRD.twist.covariance[7] = pow(bodyVelStdDevY, 2);
     bodyVelFRD.twist.covariance[14] = pow(_velStdPack.standard_deviation[2], 2);
 
-    _publisher.publish(bodyVelFRD);
+    auto publisher = std::dynamic_pointer_cast<rclcpp::Publisher<geometry_msgs::msg::TwistWithCovarianceStamped>>(_publisher);
+    if(publisher)
+        publisher->publish(bodyVelFRD);
 }

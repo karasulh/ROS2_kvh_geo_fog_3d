@@ -6,147 +6,97 @@
 # it is requested that you send an email to opensource@mitre.org in order to
 # let us know where this software is being used.
 
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(kvh_geo_fog_3d_rviz)
 
-## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11)
+if(NOT CMAKE_C_STANDARD)
+  set(CMAKE_C_STANDARD 99)
+endif()
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  diagnostic_msgs
-  kvh_geo_fog_3d_msgs
-  roslint
-  rviz
-)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+# find dependencies
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(diagnostic_msgs REQUIRED)
+find_package(kvh_geo_fog_3d_msgs REQUIRED)
+find_package(rviz2 REQUIRED)
+find_package(rviz_common REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
 
 # QT
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-if("${rviz_QT_VERSION}" VERSION_LESS "5")
-  message(STATUS "Using Qt4 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
-  find_package(Qt4 ${rviz_QT_VERSION} REQUIRED COMPONENTS QtCore QtGui)
-  include(${QT_USE_FILE})
-  qt4_wrap_cpp(QT_MOC include/kvh_geo_fog_3d_status_panel.hpp include/kvh_status_painter.hpp)
-else()
-  message(STATUS "Using Qt5 based on the rviz_QT_VERSION: ${rviz_QT_VERSION}")
-  find_package(Qt5 ${rviz_QT_VERSION} REQUIRED COMPONENTS Core Widgets)
-  set(QT_LIBRARIES Qt5::Core Qt5::Widgets)
-  qt5_wrap_cpp(QT_MOC include/kvh_geo_fog_3d_status_panel.hpp include/kvh_status_painter.hpp)
-endif()
+set(QT_LIBRARIES Qt5::Core Qt5::Widgets)
+qt5_wrap_cpp(QT_MOC include/kvh_geo_fog_3d_status_panel.hpp include/kvh_status_painter.hpp)
 
 add_definitions(-DQT_NO_KEYWORDS)
 
-
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
- INCLUDE_DIRS include
- LIBRARIES ${PROJECT_NAME}
- CATKIN_DEPENDS diagnostic_msgs kvh_geo_fog_3d_msgs rviz
-)
-
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 include_directories(
- include
- ${catkin_INCLUDE_DIRS}
+  include
 )
 
-# Declare a C++ library
 add_library(${PROJECT_NAME}
   src/kvh_geo_fog_3d_status_panel.cpp
   src/kvh_status_painter.cpp
   ${QT_MOC}
 )
 
-# Add cmake target dependencies of the library
-# as an example, code may need to be generated before libraries
-# either from message generation or dynamic reconfigure
-add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
 
-# Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}
+ament_target_dependencies(${PROJECT_NAME}
+  diagnostic_msgs kvh_geo_fog_3d_msgs rviz2 rviz_common ${THIS_PACKAGE_INCLUDE_DEPENDS}
+)
+
+target_link_libraries(
+  ${PROJECT_NAME} 
   ${QT_LIBRARIES}
-  ${catkin_LIBRARIES}
 )
 
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-## Mark executable scripts (Python etc.) for installation
-## in contrast to setup.py, you can choose the destination
-# install(PROGRAMS
-#   scripts/my_python_script
-#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
-
-# Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+install(
+  TARGETS ${PROJECT_NAME}
+  DESTINATION lib/${PROJECT_NAME}
 )
 
-# Mark cpp header files for installation
-install(DIRECTORY include/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.hpp"
-  PATTERN ".svn" EXCLUDE
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
-# Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES
-  plugin_description.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+pluginlib_export_plugin_description_file(rviz_common plugin_description.xml)
 
-#############
-## Testing ##
-#############
 
-## Add roslint target
-# Note that roslint requires explicit lists of source/header
-# files, which is not ideal. There's an issue open from 2014
-# about this (https://github.com/ros/roslint/issues/27)
-#
-# Ignore ROS's suggestions for:
-# * Comment spacing
-# * Parentesis whitespace
-set(ROSLINT_CPP_OPTS "--filter=-whitespace/comments,-whitespace/parens")
-roslint_cpp(
-  src/kvh_geo_fog_3d_status_panel.cpp
-  src/kvh_status_painter.cpp
-  include/kvh_geo_fog_3d_status_panel.hpp
-  include/kvh_status_painter.hpp
-)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_cppcheck_FOUND TRUE)
+  set(ament_cmake_copyright_FOUND TRUE)
+  set(ament_cmake_cpplint_FOUND TRUE)
+  set(ament_cmake_flake8_FOUND TRUE)
+  set(ament_cmake_uncrustify_FOUND TRUE)
+  set(ament_cmake_lint_cmake_FOUND TRUE)
+  set(ament_cmake_xmllint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_ublox_rviz.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+ament_export_include_directories(include)
+ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_package()

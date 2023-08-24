@@ -32,6 +32,7 @@
 
 #include <map>
 #include <set>
+#include <string>
 
 // GEO-FOG
 #include "an_packet_protocol.h"

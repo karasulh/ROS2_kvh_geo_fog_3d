@@ -59,8 +59,8 @@ namespace kvh
   {
     bool gnssEnabled{true};
     int baudRate{115200};
-    std::string port{"/tty/USB0"};
-    bool debugOn{false};
+    std::string port{"/dev/ttyUSB0"};
+    bool debugOn{true};//false
     uint8_t filterVehicleType{vehicle_type_car};
     bool atmosphericAltitudeEnabled{true};
     bool velocityHeadingEnabled{true};

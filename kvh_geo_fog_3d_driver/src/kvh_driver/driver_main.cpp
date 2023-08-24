@@ -321,6 +321,7 @@ namespace kvh
     }
 
     if (debug_) printf("Recieved %d unexpected packets during transmission.\n", unexpectedPackets);
+    return 0; //added to prevent warning
   } // END Once()
 
   /**

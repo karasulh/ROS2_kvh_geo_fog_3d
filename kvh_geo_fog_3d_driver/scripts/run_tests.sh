@@ -8,11 +8,16 @@
 # ./scripts/run_tests.sh -b Builds with the tests, good for debugging, but doesn't show test results
 
 
-
 if [[ $1 == '-v' ]]; then
-    catkin build kvh_geo_fog_3d_driver --verbose --catkin-make-args run_tests
+{
+    colcon test --packages-select kvh_geo_fog_3d_driver
+    colcon test-result --all --verbose
+}
 elif [[ $1 == '-b' ]]; then
-    catkin build kvh_geo_fog_3d_driver --catkin-make-args run_tests
+    colcon test --packages-select kvh_geo_fog_3d_driver
 else
-    catkin build kvh_geo_fog_3d_driver --verbose --catkin-make-args run_tests | grep '\[.\{10\}\]'
+{
+    colcon test --packages-select kvh_geo_fog_3d_driver
+    colcon test-result --all
+}  
 fi

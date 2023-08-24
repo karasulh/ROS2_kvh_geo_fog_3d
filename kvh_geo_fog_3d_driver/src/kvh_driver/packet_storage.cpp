@@ -51,7 +51,7 @@ int KvhPacketStorage::Init(KvhPacketRequest &_packRequest)
 
   int returnValue = 0;
   int tempReturn = 0;
-  for (int i = 0; i < _packRequest.size(); i++)
+  for (int i = 0; (std::size_t)i < _packRequest.size(); i++)
   {
     tempReturn = AddPacket(_packRequest.at(i).first);
 

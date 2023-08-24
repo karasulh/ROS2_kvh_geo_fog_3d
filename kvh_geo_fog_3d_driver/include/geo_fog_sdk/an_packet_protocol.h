@@ -35,6 +35,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 #define AN_PACKET_HEADER_SIZE 5
 #define AN_MAXIMUM_PACKET_SIZE 255
 #define AN_DECODE_BUFFER_SIZE 10*(AN_MAXIMUM_PACKET_SIZE+AN_PACKET_HEADER_SIZE)

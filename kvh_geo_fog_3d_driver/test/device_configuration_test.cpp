@@ -83,9 +83,9 @@ TEST(DeviceConfiguration, createPacketPeriodsSmallRequest)
     // period = 1000 / frequency
     // This is a simplified equations as you can technically change the 1000
     EXPECT_EQ(packet_id_system_state, periodsPacket.packet_periods[0].packet_id);
-    EXPECT_EQ(20, periodsPacket.packet_periods[0].period);
+    EXPECT_EQ((unsigned int)20, periodsPacket.packet_periods[0].period);
     EXPECT_EQ(packet_id_raw_sensors, periodsPacket.packet_periods[1].packet_id);
-    EXPECT_EQ(20, periodsPacket.packet_periods[1].period);
+    EXPECT_EQ((unsigned int)20, periodsPacket.packet_periods[1].period);
 }
 
 TEST(DeviceConfiguration, createPacketPeriodsUnsupported)

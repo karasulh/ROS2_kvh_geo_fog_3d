@@ -40,9 +40,10 @@
 #include <QPainter>
 #include <QFont>
 
-#include "diagnostic_msgs/DiagnosticArray.h"
+#include "diagnostic_msgs/msg/diagnostic_array.hpp"
 #include <functional>
 
+using std::placeholders::_1;
 
 namespace kvh
 {
@@ -55,7 +56,7 @@ namespace kvh
    * to our ROS callback for diagnostics messages.
    */
   StatusPanel::StatusPanel(QWidget* parent)
-    : rviz::Panel(parent)
+    : rviz_common::Panel(parent)
   {
     QFont h1_font("Times", 18);
     QFont h2_font("Times", 14);
@@ -171,7 +172,9 @@ namespace kvh
     layout->addLayout(filter_status);
     layout->addLayout(filter_status_2);
 
-    diag_sub_ = nh_.subscribe("diagnostics", 1, &StatusPanel::DiagnosticsCallback, this);
+    //diag_sub_ = nh_.subscribe("diagnostics", 1, &StatusPanel::DiagnosticsCallback, this);//ROS1
+    diag_sub_ = node->create_subscription<diagnostic_msgs::msg::DiagnosticArray>("diagnostics", 1,std::bind(&StatusPanel::DiagnosticsCallback,this,_1));
+           
         
     setLayout(layout);
   }
@@ -206,9 +209,9 @@ namespace kvh
    * Does the work of parsing out diagnostics information and filling in our
    * map.
    */
-  void StatusPanel::DiagnosticsCallback(const diagnostic_msgs::DiagnosticArray::ConstPtr& _diagArray)
+  void StatusPanel::DiagnosticsCallback(const diagnostic_msgs::msg::DiagnosticArray& _diagArray)
   {
-    ROS_DEBUG("Recieved diagnostic message.");
+    RCLCPP_DEBUG(node->get_logger(),"Recieved diagnostic message.");
     int kvh_filters_index{0};
     bool kvh_filters_found{false};
         
@@ -216,7 +219,7 @@ namespace kvh
     bool kvh_system_found{false};
 
     int loopCount{0};
-    for(diagnostic_msgs::DiagnosticStatus status : _diagArray->status)
+    for(diagnostic_msgs::msg::DiagnosticStatus status : _diagArray.status)
     {
       if(status.name == "kvh_geo_fog_3d_driver_node: KVH Filters" && status.hardware_id == "KVH GEO FOG 3D")
       {
@@ -233,11 +236,11 @@ namespace kvh
 
     if (kvh_filters_found)
     {
-      diagnostic_msgs::DiagnosticStatus kvh_status = _diagArray->status[kvh_filters_index];
+      diagnostic_msgs::msg::DiagnosticStatus kvh_status = _diagArray.status[kvh_filters_index];
 
-      for (diagnostic_msgs::KeyValue pair : kvh_status.values)
+      for (diagnostic_msgs::msg::KeyValue pair : kvh_status.values)
       {
-        ROS_DEBUG("%s, %s", pair.key.c_str(), pair.value.c_str());
+        RCLCPP_DEBUG(node->get_logger(),"%s, %s", pair.key.c_str(), pair.value.c_str());
         if(pair.key == "Orient INIT")
         {
           painter_map_["orientation_init"]->setEnabled(pair.value == "True");
@@ -302,16 +305,16 @@ namespace kvh
         }
         else
         {
-          ROS_ERROR("CODING ERROR! You shouldn't be able to get here.");
+          RCLCPP_ERROR(node->get_logger(),"CODING ERROR! You shouldn't be able to get here.");
         }
       }
     }
 
     if (kvh_system_found)
     {
-      diagnostic_msgs::DiagnosticStatus kvh_system_status = _diagArray->status[kvh_system_index];
+      diagnostic_msgs::msg::DiagnosticStatus kvh_system_status = _diagArray.status[kvh_system_index];
 
-      for (diagnostic_msgs::KeyValue pair : kvh_system_status.values)
+      for (diagnostic_msgs::msg::KeyValue pair : kvh_system_status.values)
       {
         if (pair.key == "System")
         {
@@ -386,5 +389,5 @@ namespace kvh
 }
 
 // Exporting the plugin
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(kvh::StatusPanel, rviz::Panel);
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(kvh::StatusPanel, rviz_common::Panel);

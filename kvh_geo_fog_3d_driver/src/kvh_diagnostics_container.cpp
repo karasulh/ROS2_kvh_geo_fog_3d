@@ -41,7 +41,7 @@ void mitre::KVH::DiagnosticsContainer::UpdateSystemStatus(diagnostic_updater::Di
   {
     if( systemStatus_ == 0 )
     {
-      stat.summary(diagnostic_msgs::DiagnosticStatus::OK, "System State OK");
+      stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "System State OK");
       stat.add("System", false);
       stat.add("Accel", false);
       stat.add("Gyro", false);
@@ -61,7 +61,7 @@ void mitre::KVH::DiagnosticsContainer::UpdateSystemStatus(diagnostic_updater::Di
     } //end: if( systemStatus_ == 0 )
     else
     {
-      stat.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "System FAULT");
+      stat.summary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "System FAULT");
       if( systemStatus_ & 0x1 )
       {
         stat.add("System", true);
@@ -194,13 +194,13 @@ void mitre::KVH::DiagnosticsContainer::UpdateSystemStatus(diagnostic_updater::Di
   } //end: if( receivedSystemStatus )
   else
   {
-    stat.summary(diagnostic_msgs::DiagnosticStatus::STALE, "Waiting on initial SystemState packet");
+    stat.summary(diagnostic_msgs::msg::DiagnosticStatus::STALE, "Waiting on initial SystemState packet");
   } //end: else
 } //end: UpdateSystemStatus()
 
 void mitre::KVH::DiagnosticsContainer::UpdateFilterStatus(diagnostic_updater::DiagnosticStatusWrapper &stat)
 {
-  uint8_t level = diagnostic_msgs::DiagnosticStatus::OK;
+  uint8_t level = diagnostic_msgs::msg::DiagnosticStatus::OK;
   if( receivedFilterStatus_ )
   {
     ///////////////////////////////////////////////////////
@@ -209,28 +209,28 @@ void mitre::KVH::DiagnosticsContainer::UpdateFilterStatus(diagnostic_updater::Di
     bool currentValue = filterStatus_ & 0x1;
     if( currentValue == false )
     {
-      level = diagnostic_msgs::DiagnosticStatus::WARN;
+      level = diagnostic_msgs::msg::DiagnosticStatus::WARN;
     }
     stat.add("Orient INIT", currentValue);
 
     currentValue = filterStatus_ & 0x2;
     if( currentValue == false )
     {
-      level = diagnostic_msgs::DiagnosticStatus::WARN;
+      level = diagnostic_msgs::msg::DiagnosticStatus::WARN;
     }
     stat.add("Nav INIT", currentValue);
 
     currentValue = filterStatus_ & 0x4;
     if( currentValue == false )
     {
-      level = diagnostic_msgs::DiagnosticStatus::WARN;
+      level = diagnostic_msgs::msg::DiagnosticStatus::WARN;
     }
     stat.add("Heading INIT", currentValue);
 
     currentValue = filterStatus_ & 0x8;
     if( currentValue == false )
     {
-      level = diagnostic_msgs::DiagnosticStatus::WARN;
+      level = diagnostic_msgs::msg::DiagnosticStatus::WARN;
     }
     stat.add("Time INIT", currentValue);
     ///////////////////////////////////////////////////////
@@ -244,7 +244,7 @@ void mitre::KVH::DiagnosticsContainer::UpdateFilterStatus(diagnostic_updater::Di
     {
       case 0:
       {
-        level = diagnostic_msgs::DiagnosticStatus::WARN;
+        level = diagnostic_msgs::msg::DiagnosticStatus::WARN;
         currentStatusStr = std::string("No Fix");
         break;
       }
@@ -314,7 +314,7 @@ void mitre::KVH::DiagnosticsContainer::UpdateFilterStatus(diagnostic_updater::Di
     stat.add("EXT Heading Active", extHeadingActive);
     ///////////////////////////////////////////////////////
 
-    if( level == diagnostic_msgs::DiagnosticStatus::OK )
+    if( level == diagnostic_msgs::msg::DiagnosticStatus::OK )
     {
       stat.summary(level, "Filters OK");
     }
@@ -325,7 +325,7 @@ void mitre::KVH::DiagnosticsContainer::UpdateFilterStatus(diagnostic_updater::Di
   } //end: if( receivedFilterStatus_ )
   else
   {
-    level = diagnostic_msgs::DiagnosticStatus::STALE;
+    level = diagnostic_msgs::msg::DiagnosticStatus::STALE;
     stat.summary(level, "Waiting on initial FilterStatus packet");
   } //end: else
 } //end: UpdateFilterStatus()

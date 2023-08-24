@@ -7,7 +7,7 @@
 # header.stamp specifies the ROS time for this measurement. Satellite
 # time is reported as unix_time_s and unix_time_us.
 #
-Header header
+std_msgs/Header header
 
 #
 # Horizontal dilution of precision (HDOP). Describes

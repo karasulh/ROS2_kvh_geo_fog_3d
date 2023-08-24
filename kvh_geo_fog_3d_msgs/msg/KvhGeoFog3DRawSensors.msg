@@ -12,7 +12,7 @@
 # header.stamp specifies the ROS time for this measurement. Satellite
 # time is reported as unix_time_s and unix_time_us.
 #
-Header header
+std_msgs/Header header
 
 #
 # Accelerometer X,Y,Z in m/s^2
@@ -31,9 +31,9 @@ float32 gyro_z_rps
 #
 # Mangetometer in mG
 #
-float32 magnetometer_x_mG
-float32 magnetometer_y_mG
-float32 magnetometer_z_mG
+float32 magnetometer_x_mg
+float32 magnetometer_y_mg
+float32 magnetometer_z_mg
 
 #
 # IMU Temperature deg C

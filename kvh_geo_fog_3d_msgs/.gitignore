@@ -1,5 +1,0 @@
-##
-# Don't track MITRE-specific files
-build_deb.sh
-clean_deb.sh
-##

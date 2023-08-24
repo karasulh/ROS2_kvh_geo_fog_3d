@@ -1,4 +1,6 @@
-# kvh-geo-fog-3d-driver
+# ROS2-kvh-geo-fog-3d-driver
+
+ROS2 version of kvh-geo-fog-3d-driver by Bugrahan Kara. Thanks to Trevor and Zach from mitre for this driver. 
 
 Driver for the KVH GEO FOG 3D inertial navigation systems. Connects over serial
 to the KVH GEO FOG 3D device and publishes out both KVH-specific and generic

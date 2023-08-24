@@ -1,29 +1,26 @@
 <?xml version="1.0"?>
-<!--
-Copyright (c) 2019, The MITRE Corporation
-All rights reserved.
-
-Sections of this project contains content developed by The MITRE Corporation.
-If this code is used in a deployment or embedded within another project,
-it is requested that you send an email to opensource@mitre.org in order to
-let us know where this software is being used.
--->
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>kvh_geo_fog_3d</name>
-  <version>1.5.1</version>
-  <description>Provides a driver node for KVH GEO FOG 3D INS sensors, messages, and rviz plugins.</description>
-  <author email="zlacelle@mitre.org">Zach LaCelle</author>
-  <maintainer email="zlacelle@mitre.org">Zach LaCelle</maintainer>
-  <license>Apache 2.0</license>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="kgye@kgye.com">kgye</maintainer>
+  <license>TODO: License declaration</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>kvh_geo_fog_3d_msgs</exec_depend>
-  <exec_depend>kvh_geo_fog_3d_driver</exec_depend>
-  <exec_depend>kvh_geo_fog_3d_rviz</exec_depend>
-  <!-- The export tag contains other, unspecified, tags -->
+  <depend>rclcpp</depend>
+  <depend>kvh_geo_fog_3d_msgs</depend>
+  <depend>kvh_geo_fog_3d_driver</depend>
+  <depend>kvh_geo_fog_3d_rviz</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
   <export>
-    <rosdoc external="http://www.kvh.com/admin/products/gyros-imus-inss/ins/geo-fog-3d-dual/commercial-geo-fog-3d-dual/"/>
-    <metapackage />
+    <build_type>ament_cmake</build_type>
+<!--<rosdoc external="http://www.kvh.com/admin/products/gyros-imus-inss/ins/geo-fog-3d-dual/commercial-geo-fog-3d-dual/"/>-->
   </export>
 </package>
+
+

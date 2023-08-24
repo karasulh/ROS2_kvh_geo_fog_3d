@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <launch>
   <arg name="port" default="/dev/ttyUSB0" />
   <!-- The default baud rate of the sensor is 115200. The suggestions is
@@ -19,18 +18,18 @@
   <arg name="encoderOnLeft" default="True" /> <!-- True means left-side rear-axle-mounted encoder, False means right-side rear-axle-mounted encoder -->
   <arg name="odometerVelocityCovariance" default="0.00001" /> <!-- Covariance value to use for vehicle-center-calculated velocity based on wheel encoder, in case you want to fuse into robot_localizaiton. -->
   
-  <node pkg="kvh_geo_fog_3d_driver" type="kvh_geo_fog_3d_driver_node" name="kvh_geo_fog_3d_driver_node" output="screen">
-    <param name="port" value="$(arg port)" />
-    <param name="baud" value="$(arg baud)" />
-    <param name="debug" value="$(arg debug)" />
-    <param name="odomPulseToMeters" value="$(arg odomPulseToMeters)" />
-    <param name="filterVehicleType" value="$(arg filterVehicleType)" />
-    <param name="atmosphericAltitudeEnabled" value="$(arg atmosphericAltitudeEnabled)" />
-    <param name="velocityHeadingEnabled" value="$(arg velocityHeadingEnabled)" />
-    <param name="reversingDetectionEnabled" value="$(arg reversingDetectionEnabled)" />
-    <param name="motionAnalysisEnabled" value="$(arg motionAnalysisEnabled)" />
-    <param name="vehicleTrackWidth" value="$(arg vehicleTrackWidth)" />
-    <param name="encoderOnLeft" value="$(arg encoderOnLeft)" />
-    <param name="odometerVelocityCovariance" value="$(arg odometerVelocityCovariance)" />
+  <node pkg="kvh_geo_fog_3d_driver" exec="kvh_geo_fog_3d_driver_node" name="kvh_geo_fog_3d_driver_node" output="screen">
+    <param name="port" value="$(var port)" />
+    <param name="baud" value="$(var baud)" />
+    <param name="debug" value="$(var debug)" />
+    <param name="odomPulseToMeters" value="$(var odomPulseToMeters)" />
+    <param name="filterVehicleType" value="$(var filterVehicleType)" />
+    <param name="atmosphericAltitudeEnabled" value="$(var atmosphericAltitudeEnabled)" />
+    <param name="velocityHeadingEnabled" value="$(var velocityHeadingEnabled)" />
+    <param name="reversingDetectionEnabled" value="$(var reversingDetectionEnabled)" />
+    <param name="motionAnalysisEnabled" value="$(var motionAnalysisEnabled)" />
+    <param name="vehicleTrackWidth" value="$(var vehicleTrackWidth)" />
+    <param name="encoderOnLeft" value="$(var encoderOnLeft)" />
+    <param name="odometerVelocityCovariance" value="$(var odometerVelocityCovariance)" />
   </node>
 </launch>

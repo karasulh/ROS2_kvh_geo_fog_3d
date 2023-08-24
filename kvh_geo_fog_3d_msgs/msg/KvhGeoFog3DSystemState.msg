@@ -26,7 +26,7 @@
 # header.stamp specifies the ROS time for this measurement. Satellite
 # time is reported as unix_time_s and unix_time_us.
 #
-Header header
+std_msgs/Header header
 
 #
 # System status bitmask, as reported by the KVH GEO FOG 3D.

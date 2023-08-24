@@ -28,6 +28,7 @@
  * @author Trevor Bostic
  */
 
+#include <iostream>
 #include "kvh_geo_fog_3d_global_vars.hpp"
 #include <typeinfo>
 

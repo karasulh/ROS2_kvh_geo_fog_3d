@@ -6,33 +6,33 @@
 #include "kvh_geo_fog_3d_global_vars.hpp"
 
 // CUSTOM ROS MESSAGES
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DSystemState.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DSatellites.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DDetailSatellites.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DLocalMagneticField.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DUTMPosition.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DECEFPos.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DNorthSeekingInitStatus.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DOdometerState.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DRawGNSS.h>
-#include <kvh_geo_fog_3d_msgs/KvhGeoFog3DRawSensors.h>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_system_state.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_satellites.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_detail_satellites.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_local_magnetic_field.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_dutm_position.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_decef_pos.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_north_seeking_init_status.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_odometer_state.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_raw_gnss.hpp>
+#include <kvh_geo_fog_3d_msgs/msg/kvh_geo_fog3_d_raw_sensors.hpp>
 
 // ROS
-#include <ros/ros.h>
+#include "rclcpp/rclcpp.hpp"
 #include "tf2/LinearMath/Quaternion.h"
 #include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
 
 // Standard ROS msgs
-#include "sensor_msgs/Imu.h"
-#include "sensor_msgs/NavSatFix.h"
-#include "sensor_msgs/NavSatStatus.h"
-#include "sensor_msgs/MagneticField.h"
-#include "nav_msgs/Odometry.h"
-#include "geometry_msgs/Quaternion.h"
-#include "geometry_msgs/Vector3.h"
-#include "geometry_msgs/Vector3Stamped.h"
-#include "geometry_msgs/TwistWithCovarianceStamped.h"
+#include "sensor_msgs/msg/imu.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
+#include "sensor_msgs/msg/nav_sat_status.hpp"
+#include "sensor_msgs/msg/magnetic_field.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+#include "geometry_msgs/msg/quaternion.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
+#include "geometry_msgs/msg/vector3_stamped.hpp"
+#include "geometry_msgs/msg/twist_with_covariance_stamped.hpp"
 
 
 // Bound rotations
@@ -45,39 +45,39 @@ double BoundFromZeroTo2Pi(const float);
 tf2::Quaternion quatFromRPY(double roll, double pitch, double yaw);
 
 // Custom ROS Message
-void PublishSystemState(ros::Publisher&, system_state_packet_t);
-void PublishSatellites(ros::Publisher&, satellites_packet_t);
-void PublishSatellitesDetailed(ros::Publisher&, detailed_satellites_packet_t);
-void PublishLocalMagnetics(ros::Publisher&, local_magnetics_packet_t);
-void PublishUtmPosition(ros::Publisher&, utm_position_packet_t);
-void PublishEcefPosition(ros::Publisher&, ecef_position_packet_t);
-void PublishNorthSeekingStatus(ros::Publisher&, north_seeking_status_packet_t);
-void PublishKvhOdometerState(ros::Publisher&, odometer_state_packet_t);
-void PublishRawSensors(ros::Publisher&, raw_sensors_packet_t);
-void PublishRawGnss(ros::Publisher&, raw_gnss_packet_t);
+void PublishSystemState(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishSatellites(rclcpp::PublisherBase::SharedPtr&, satellites_packet_t,rclcpp::Clock&);
+void PublishSatellitesDetailed(rclcpp::PublisherBase::SharedPtr&, detailed_satellites_packet_t,rclcpp::Clock&);
+void PublishLocalMagnetics(rclcpp::PublisherBase::SharedPtr&, local_magnetics_packet_t,rclcpp::Clock&);
+void PublishUtmPosition(rclcpp::PublisherBase::SharedPtr&, utm_position_packet_t,rclcpp::Clock&);
+void PublishEcefPosition(rclcpp::PublisherBase::SharedPtr&, ecef_position_packet_t,rclcpp::Clock&);
+void PublishNorthSeekingStatus(rclcpp::PublisherBase::SharedPtr&, north_seeking_status_packet_t,rclcpp::Clock&);
+void PublishKvhOdometerState(rclcpp::PublisherBase::SharedPtr&, odometer_state_packet_t,rclcpp::Clock&);
+void PublishRawSensors(rclcpp::PublisherBase::SharedPtr&, raw_sensors_packet_t,rclcpp::Clock&);
+void PublishRawGnss(rclcpp::PublisherBase::SharedPtr&, raw_gnss_packet_t,rclcpp::Clock&);
 
 // Standard ROS Messages
-void PublishIMURaw(ros::Publisher&, system_state_packet_t);
-void PublishIMURawFLU(ros::Publisher&, system_state_packet_t);
-void PublishIMU_NED(ros::Publisher&, system_state_packet_t, euler_orientation_standard_deviation_packet_t);
-void PublishIMU_ENU(ros::Publisher&, system_state_packet_t, euler_orientation_standard_deviation_packet_t);
-void PublishIMU_RPY_NED(ros::Publisher&, system_state_packet_t);
-void PublishIMU_RPY_NED_DEG(ros::Publisher&, system_state_packet_t);
-void PublishIMU_RPY_ENU(ros::Publisher&, system_state_packet_t);
-void PublishIMU_RPY_ENU_DEG(ros::Publisher&, system_state_packet_t);
-void PublishNavSatFix(ros::Publisher&, system_state_packet_t);
-void PublishRawNavSatFix(ros::Publisher&, system_state_packet_t, raw_gnss_packet_t);
-void PublishMagField(ros::Publisher&, raw_sensors_packet_t);
-void PublishOdomNED(ros::Publisher &, system_state_packet_t, utm_position_packet_t, 
-    euler_orientation_standard_deviation_packet_t, body_velocity_packet_t);
-void PublishOdomENU(ros::Publisher &, system_state_packet_t , utm_position_packet_t,
-                    euler_orientation_standard_deviation_packet_t, body_velocity_packet_t);
-void PublishOdomState(ros::Publisher&, odometer_state_packet_t, double);
-void PublishOdomSpeed(ros::Publisher&, system_state_packet_t, odometer_state_packet_t, double, double, bool);
-void PublishIMUSensorRaw(ros::Publisher&, raw_sensors_packet_t);
-void PublishIMUSensorRawFLU(ros::Publisher&, raw_sensors_packet_t);
-void PublishVelNEDTwist(ros::Publisher&, system_state_packet_t, velocity_standard_deviation_packet_t);
-void PublishVelENUTwist(ros::Publisher&, system_state_packet_t, velocity_standard_deviation_packet_t);
-void PublishVelBodyTwistFLU(ros::Publisher&, system_state_packet_t, body_velocity_packet_t, velocity_standard_deviation_packet_t);
-void PublishVelBodyTwistFRD(ros::Publisher&, system_state_packet_t, body_velocity_packet_t, velocity_standard_deviation_packet_t);
+void PublishIMURaw(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishIMURawFLU(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishIMU_NED(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, euler_orientation_standard_deviation_packet_t,rclcpp::Clock&);
+void PublishIMU_ENU(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, euler_orientation_standard_deviation_packet_t,rclcpp::Clock&);
+void PublishIMU_RPY_NED(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishIMU_RPY_NED_DEG(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishIMU_RPY_ENU(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishIMU_RPY_ENU_DEG(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishNavSatFix(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t,rclcpp::Clock&);
+void PublishRawNavSatFix(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, raw_gnss_packet_t,rclcpp::Clock&);
+void PublishMagField(rclcpp::PublisherBase::SharedPtr&, raw_sensors_packet_t,rclcpp::Clock&);
+void PublishOdomNED(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, utm_position_packet_t, 
+    euler_orientation_standard_deviation_packet_t, body_velocity_packet_t,rclcpp::Clock&);
+void PublishOdomENU(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t , utm_position_packet_t,
+                    euler_orientation_standard_deviation_packet_t, body_velocity_packet_t,rclcpp::Clock&);
+void PublishOdomState(rclcpp::PublisherBase::SharedPtr&, odometer_state_packet_t, double,rclcpp::Clock&);
+void PublishOdomSpeed(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, odometer_state_packet_t, double, double, bool,rclcpp::Clock&);
+void PublishIMUSensorRaw(rclcpp::PublisherBase::SharedPtr&, raw_sensors_packet_t,rclcpp::Clock&);
+void PublishIMUSensorRawFLU(rclcpp::PublisherBase::SharedPtr&, raw_sensors_packet_t,rclcpp::Clock&);
+void PublishVelNEDTwist(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, velocity_standard_deviation_packet_t,rclcpp::Clock&);
+void PublishVelENUTwist(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, velocity_standard_deviation_packet_t,rclcpp::Clock&);
+void PublishVelBodyTwistFLU(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, body_velocity_packet_t, velocity_standard_deviation_packet_t,rclcpp::Clock&);
+void PublishVelBodyTwistFRD(rclcpp::PublisherBase::SharedPtr&, system_state_packet_t, body_velocity_packet_t, velocity_standard_deviation_packet_t,rclcpp::Clock&);
 

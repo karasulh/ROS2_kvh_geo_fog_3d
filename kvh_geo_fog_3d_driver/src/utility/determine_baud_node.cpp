@@ -41,13 +41,12 @@
 #include "spatial_packets.h"
 
 // ROS
-#include "ros/ros.h"
+#include "rclcpp/rclcpp.hpp"
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "kvh_geo_fog_3d_driver");
-
-    ros::NodeHandle node("~");
+    rclcpp::init(argc, argv);
+    auto node = rclcpp::Node::make_shared("determine_baud_node");
 
     std::set<int> baudRates = {
         1200, 1800, 2400, 4800, 9600,
@@ -57,22 +56,22 @@ int main(int argc, char **argv)
     std::string kvhPort("/dev/ttyUSB0");
     int startingBaud = 1200;
     // Check if the port has been set on the ros param server
-    if (node.getParam("port", kvhPort))
+    if (node->get_parameter("port", kvhPort))
     {
-        ROS_INFO_STREAM("Connecting to KVH on port " << kvhPort);
+        RCLCPP_INFO_STREAM(node->get_logger(),"Connecting to KVH on port " << kvhPort);
     }
     else
     {
-        ROS_WARN("No port specified by param, defaulting to USB0!");
+        RCLCPP_WARN(node->get_logger(),"No port specified by param, defaulting to USB0!");
     }
 
-    if (node.getParam("starting_baud", startingBaud))
+    if (node->get_parameter("starting_baud", startingBaud))
     {
-        ROS_INFO_STREAM("Starting baud check at " << startingBaud);
+        RCLCPP_INFO_STREAM(node->get_logger(),"Starting baud check at " << startingBaud);
     }
     else
     {
-        ROS_WARN("No starting baud specified. Defaulting to 1200.");
+        RCLCPP_WARN(node->get_logger(),"No starting baud specified. Defaulting to 1200.");
     }
     
 

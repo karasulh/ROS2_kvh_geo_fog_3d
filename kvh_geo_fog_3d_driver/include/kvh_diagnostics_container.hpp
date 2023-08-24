@@ -29,8 +29,8 @@
  */
 
 #pragma once
+#include <diagnostic_updater/diagnostic_status_wrapper.hpp>
 
-#include <diagnostic_updater/DiagnosticStatusWrapper.h>
 
 namespace mitre
 {

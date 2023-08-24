@@ -35,6 +35,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h>
+
 #define MAXIMUM_PACKET_PERIODS 50
 #define MAXIMUM_DETAILED_SATELLITES 32
 

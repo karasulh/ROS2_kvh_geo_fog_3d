@@ -29,7 +29,7 @@
  *
  * Leverages the AN packet library to convert to our internal structures
  */
-
+#include <iostream>
 #include "kvh_geo_fog_3d_driver.hpp"
 #include <cmath>
 
