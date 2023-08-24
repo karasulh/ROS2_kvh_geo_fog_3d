@@ -137,7 +137,7 @@ First you will need to clone and build the repository
 ```bash
 $ git clone <url>
 $ cd kvh_geo_fog_3d
-$ catkin build kvh_geo_fog_3d
+$ colcon build --packages-select kvh_geo_fog_3d
 ```
 
 It is important that you have the KVH messages installed properly. After building initially you can check by running:
@@ -151,7 +151,7 @@ You should see the messages listed in the KVH-specific messages section above.
 Now you should be able to launch the driver by running
 
 ```bash
-$ roslaunch kvh_geo_fog_3d_driver kvh_geo_fog_3d_node.launch port:=<port> baud:=<baud> # E.g., port="/dev/ttyUSB0" baud="921600"
+$ ros2 launch kvh_geo_fog_3d_driver kvh_geo_fog_3d_node_launch port:=<port> baud:=<baud> # E.g., port="/dev/ttyUSB0" baud="921600"
 ```
 If everything is set up properly, you should be able to see data being output on each of the topics listed above. Currently the driver is hardcoded to output the data from the following kvh packets:
 1. System State
